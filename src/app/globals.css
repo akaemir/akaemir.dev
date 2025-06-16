@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+
+.profile-photo-container{
+  width: 300px; /* Konteynerin genişliği */
+  height: 300px; /* Konteynerin yüksekliği */
+  overflow: hidden; /* Taşan kısımları gizle */
+  position: relative; /* Pozisyonu ayarlamak için */
+}
+.profile-photo {
+ width: 100%; /* Genişliği konteynerin genişliğine ayarla */
+  height: auto; /* Yüksekliği otomatik ayarla */
+  position: absolute; /* Pozisyonu ayarlamak için */
+  top: 30%; /* Yüksekliği ortalamak için */
+  left: 85%; /* Genişliği ortalamak için */
+  transform: translate(-50%, -50%) scale(2.55); /* Ortalamak ve yakınlaştırmak için */
+  transition: transform 0.3s ease; /* Geçiş efekti */
+  object-fit: cover; /* Resmi konteyneri dolduracak şekilde ayarla */
+}
