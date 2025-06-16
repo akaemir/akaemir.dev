@@ -114,8 +114,8 @@ const ProjectsSection = () => {
               key={project.id}
               title={project.title}
               description={project.description}
-              imgUrl={project.image}
-              gitUrl={`${process.env.NEXT_PUBLIC_BASE_PATH + project.imgUrl}`} 
+              imgUrl={`${process.env.NEXT_PUBLIC_BASE_PATH + project.image}`} 
+              gitUrl={project.gitUrl}
               previewUrl={project.previewUrl}
             />
           </motion.li>
