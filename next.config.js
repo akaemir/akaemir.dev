@@ -3,7 +3,6 @@ const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig = {
   basePath: isProd ? "/akaemir.dev" : '',
-  output: "export",
   images: {
     unoptimized: true,
   },
