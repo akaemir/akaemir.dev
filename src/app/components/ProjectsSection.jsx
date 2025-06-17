@@ -114,7 +114,7 @@ const ProjectsSection = () => {
               key={project.id}
               title={project.title}
               description={project.description}
-              imgUrl={`${process.env.NEXT_PUBLIC_BASE_PATH + project.image}`} 
+              imgUrl={project.image} 
               gitUrl={project.gitUrl}
               previewUrl={project.previewUrl}
             />
