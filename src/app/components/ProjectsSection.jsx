@@ -8,7 +8,7 @@ const projectsData = [
   {
     id: 1,
     title: "Todo List .NET 8 API",
-    description: "Project 1 description",
+    description: "N-Layered Architecture, LINQ, Fluent Validation, JWT Authentication, Entity Framework Core, AutoMapper, Swagger, and more.",
     image: "/images/projects/1.png",
     tag: ["All", "Web"],
     gitUrl: "https://github.com/akaemir/TodoList",
