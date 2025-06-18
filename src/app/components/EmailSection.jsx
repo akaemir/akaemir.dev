@@ -115,18 +115,6 @@ const EmailSection = () => {
     }
   };
 
-  if (emailSubmitted) {
-    return (
-      <div className="rounded-xl bg-[#18191E] p-8 my-4">
-        <h3 className="text-xl font-bold text-white mb-2">Thanks for message</h3>
-        <p className="text-[#ADB7BE] mb-2">I can come back as soon as possible.</p>
-        <p className="text-[#ADB7BE]">
-          Today {remainingEmails} email{remainingEmails !== 1 ? 's' : ''} left.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <section
       id="contact"
@@ -158,15 +146,6 @@ const EmailSection = () => {
             <p className="text-green-500 text-lg font-medium">
               Email sent successfully!
             </p>
-            <button
-              onClick={() => {
-                setEmailSubmitted(false);
-                setStatus('');
-              }}
-              className="mt-4 text-blue-400 hover:text-blue-300 underline"
-            >
-              Send another message
-            </button>
           </div>
         ) : (
           <form className="flex flex-col" onSubmit={handleSubmit}>
