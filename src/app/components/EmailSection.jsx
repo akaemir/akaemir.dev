@@ -11,7 +11,6 @@ const EmailSection = () => {
   const [status, setStatus] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [error, setError] = useState("");
-  const [remainingEmails, setRemainingEmails] = useState(3); // Default daily limit
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -60,6 +59,7 @@ const EmailSection = () => {
     setIsLoading(true);
     setStatus('');
     setError("");
+    setEmailSubmitted(false); // Reset submission state
 
     // Turnstile kontrolü
     if (!turnstileToken) {
@@ -90,11 +90,16 @@ const EmailSection = () => {
       const response = await fetch(endpoint, options);
       const resData = await response.json();
 
-      if (response.status === 200) {
-        console.log("Message sent.");
+      console.log('API Response:', {
+        status: response.status,
+        data: resData
+      });
+
+      // Başarı kontrolü - hem status code hem de response içindeki success flag'i kontrol et
+      if (response.ok && resData.success !== false) {
+        console.log("Message sent successfully.");
         setEmailSubmitted(true);
         setStatus('Message sent successfully!');
-        setRemainingEmails(resData.remainingEmails);
         
         // Form'u temizle
         e.target.reset();
@@ -105,11 +110,30 @@ const EmailSection = () => {
           window.turnstile.reset();
         }
       } else {
-        throw new Error(resData.error || 'An error occurred while sending the email.');
+        // Hata durumu
+        const errorMsg = resData.error || 'An error occurred while sending the email.';
+        console.error('API Error:', errorMsg);
+        setError(errorMsg);
+        setStatus('');
+        setEmailSubmitted(false);
+        
+        // Turnstile'ı reset et
+        if (window.turnstile) {
+          window.turnstile.reset();
+        }
+        setTurnstileToken('');
       }
     } catch (error) {
-      setError(error.message);
+      console.error('Fetch Error:', error);
+      setError('Network error. Please check your connection and try again.');
       setStatus('');
+      setEmailSubmitted(false);
+      
+      // Turnstile'ı reset et
+      if (window.turnstile) {
+        window.turnstile.reset();
+      }
+      setTurnstileToken('');
     } finally {
       setIsLoading(false);
     }
@@ -142,16 +166,29 @@ const EmailSection = () => {
       </div>
       <div>
         {emailSubmitted ? (
-          <div className="text-center">
-            <p className="text-green-500 text-lg font-medium">
-              Email sent successfully!
+          <div className="text-center bg-green-900/20 text-green-400 border border-green-400/20 rounded-lg p-6">
+            <p className="text-lg font-medium">
+              ✅ Email sent successfully!
             </p>
+            <p className="text-sm mt-2">
+              Thank you for your message. I'll get back to you soon!
+            </p>
+            <button
+              onClick={() => {
+                setEmailSubmitted(false);
+                setStatus('');
+                setError('');
+              }}
+              className="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors"
+            >
+              Send Another Message
+            </button>
           </div>
         ) : (
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-500/20 text-red-500 rounded-xl p-4 mb-4">
-                {error}
+              <div className="bg-red-500/20 text-red-500 rounded-xl p-4 mb-4 border border-red-500/20">
+                <strong>Error:</strong> {error}
               </div>
             )}
             <div className="mb-6">
@@ -206,7 +243,7 @@ const EmailSection = () => {
             <div className="mb-6 flex justify-center">
               <div
                 className="cf-turnstile"
-                data-sitekey={process.env.PUBLIC_CF_TURNSTILE_SITE_KEY}
+                data-sitekey={process.env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY}
                 data-theme="dark"
                 data-size="normal"
                 data-callback="onTurnstileCallback"

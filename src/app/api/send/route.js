@@ -125,15 +125,41 @@ export async function POST(req, res) {
 
     // Başarılı durumda response döndür
     return NextResponse.json(
-      { message: "Email başarıyla gönderildi!", data },
+      { 
+        message: "Email sent successfully.", 
+        success: true,
+        data: {
+          id: data.id || 'unknown'
+        }
+      },
       { status: 200 }
     );
 
   } catch (error) {
     console.error("Email gönderme hatası:", error);
+    
+    // Resend API hata detaylarını logla
+    if (error.response) {
+      console.error("Resend API Error Response:", error.response);
+      console.error("Resend API Error Data:", error.response.data);
+    }
+    
+    // Hata türüne göre mesaj belirle
+    let errorMessage = "Email does not sent. Please try again later.";
+    let statusCode = 500;
+    
+    if (error.message && error.message.includes('422')) {
+      errorMessage = "Email or domain is not valid. Please contact support.";
+      statusCode = 422;
+    }
+    
     return NextResponse.json(
-      { error: "Email gönderilemedi. Lütfen daha sonra tekrar deneyin." },
-      { status: 500 }
+      { 
+        error: errorMessage,
+        details: error.message,
+        success: false
+      },
+      { status: statusCode }
     );
   }
 }
