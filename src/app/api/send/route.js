@@ -6,8 +6,17 @@ const fromEmail = process.env.FROM_EMAIL;
 const toEmail = process.env.TO_EMAIL;
 
 export async function POST(req, res) {
-  const { email, subject, message } = await req.json();
   try {
+    const { email, subject, message } = await req.json();
+    
+    // Gerekli alanların kontrolü
+    if (!email || !subject || !message) {
+      return NextResponse.json(
+        { error: "Email, subject ve message alanları gereklidir." },
+        { status: 400 }
+      );
+    }
+
     const data = await resend.emails.send({
       from: fromEmail,
       to: [toEmail],
@@ -113,7 +122,18 @@ export async function POST(req, res) {
         </div>
       ),
     });
+
+    // Başarılı durumda response döndür
+    return NextResponse.json(
+      { message: "Email başarıyla gönderildi!", data },
+      { status: 200 }
+    );
+
   } catch (error) {
-    return NextResponse.json({ error });
+    console.error("Email gönderme hatası:", error);
+    return NextResponse.json(
+      { error: "Email gönderilemedi. Lütfen daha sonra tekrar deneyin." },
+      { status: 500 }
+    );
   }
 }
