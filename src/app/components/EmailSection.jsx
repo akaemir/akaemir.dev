@@ -10,7 +10,6 @@ const EmailSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -31,18 +30,17 @@ const EmailSection = () => {
   useEffect(() => {
     window.onTurnstileCallback = (token) => {
       setTurnstileToken(token);
-      console.log('Turnstile verification successful');
     };
 
     window.onTurnstileError = () => {
       setTurnstileToken('');
-      setStatus('Turnstile verification failed. Please try again.');
+      setStatus('Turnstile verification failed');
       console.log('Turnstile error');
     };
 
     window.onTurnstileExpired = () => {
       setTurnstileToken('');
-      setStatus('Turnstile verification expired. Please try again.');
+      setStatus('Turnstile verification expired');
       console.log('Turnstile expired');
     };
 
@@ -58,12 +56,10 @@ const EmailSection = () => {
     e.preventDefault();
     setIsLoading(true);
     setStatus('');
-    setError("");
-    setEmailSubmitted(false); // Reset submission state
 
     // Turnstile kontrolü
     if (!turnstileToken) {
-      setStatus('Please complete the Turnstile verification.');
+      setStatus('Please complete the Turnstile verification');
       setIsLoading(false);
       return;
     }
@@ -90,14 +86,8 @@ const EmailSection = () => {
       const response = await fetch(endpoint, options);
       const resData = await response.json();
 
-      console.log('API Response:', {
-        status: response.status,
-        data: resData
-      });
-
-      // Başarı kontrolü - hem status code hem de response içindeki success flag'i kontrol et
-      if (response.ok && resData.success !== false) {
-        console.log("Message sent successfully.");
+      if (response.status === 200) {
+        console.log("Message sent.");
         setEmailSubmitted(true);
         setStatus('Message sent successfully!');
         
@@ -110,30 +100,11 @@ const EmailSection = () => {
           window.turnstile.reset();
         }
       } else {
-        // Hata durumu
-        const errorMsg = resData.error || 'An error occurred while sending the email.';
-        console.error('API Error:', errorMsg);
-        setError(errorMsg);
-        setStatus('');
-        setEmailSubmitted(false);
-        
-        // Turnstile'ı reset et
-        if (window.turnstile) {
-          window.turnstile.reset();
-        }
-        setTurnstileToken('');
+        setStatus(resData.error || 'Something went wrong, please try again later.');
       }
     } catch (error) {
-      console.error('Fetch Error:', error);
-      setError('Network error. Please check your connection and try again.');
-      setStatus('');
-      setEmailSubmitted(false);
-      
-      // Turnstile'ı reset et
-      if (window.turnstile) {
-        window.turnstile.reset();
-      }
-      setTurnstileToken('');
+      setStatus('Network error, please try again later.');
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -173,24 +144,9 @@ const EmailSection = () => {
             <p className="text-sm mt-2">
               Thank you for your message. I&apos;ll get back to you soon!
             </p>
-            <button
-              onClick={() => {
-                setEmailSubmitted(false);
-                setStatus('');
-                setError('');
-              }}
-              className="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors"
-            >
-              Send Another Message
-            </button>
           </div>
         ) : (
           <form className="flex flex-col" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-500/20 text-red-500 rounded-xl p-4 mb-4 border border-red-500/20">
-                <strong>Error:</strong> {error}
-              </div>
-            )}
             <div className="mb-6">
               <label
                 htmlFor="email"
