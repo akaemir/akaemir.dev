@@ -10,6 +10,8 @@ const EmailSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [remainingEmails, setRemainingEmails] = useState(3); // Default daily limit
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -30,18 +32,18 @@ const EmailSection = () => {
   useEffect(() => {
     window.onTurnstileCallback = (token) => {
       setTurnstileToken(token);
-      console.log('Turnstile token received:', token);
+      console.log('Turnstile verification successful');
     };
 
     window.onTurnstileError = () => {
       setTurnstileToken('');
-      setStatus('Güvenlik doğrulaması hatası');
+      setStatus('Turnstile verification failed. Please try again.');
       console.log('Turnstile error');
     };
 
     window.onTurnstileExpired = () => {
       setTurnstileToken('');
-      setStatus('Güvenlik doğrulaması süresi doldu');
+      setStatus('Turnstile verification expired. Please try again.');
       console.log('Turnstile expired');
     };
 
@@ -57,10 +59,11 @@ const EmailSection = () => {
     e.preventDefault();
     setIsLoading(true);
     setStatus('');
+    setError("");
 
     // Turnstile kontrolü
     if (!turnstileToken) {
-      setStatus('Lütfen güvenlik doğrulamasını tamamlayın');
+      setStatus('Please complete the Turnstile verification.');
       setIsLoading(false);
       return;
     }
@@ -90,7 +93,8 @@ const EmailSection = () => {
       if (response.status === 200) {
         console.log("Message sent.");
         setEmailSubmitted(true);
-        setStatus('Mesajınız başarıyla gönderildi!');
+        setStatus('Message sent successfully!');
+        setRemainingEmails(resData.remainingEmails);
         
         // Form'u temizle
         e.target.reset();
@@ -101,15 +105,27 @@ const EmailSection = () => {
           window.turnstile.reset();
         }
       } else {
-        setStatus(resData.error || 'Bir hata oluştu');
+        throw new Error(resData.error || 'An error occurred while sending the email.');
       }
     } catch (error) {
-      setStatus('Ağ hatası oluştu');
-      console.error('Error:', error);
+      setError(error.message);
+      setStatus('');
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (emailSubmitted) {
+    return (
+      <div className="rounded-xl bg-[#18191E] p-8 my-4">
+        <h3 className="text-xl font-bold text-white mb-2">Thanks for message</h3>
+        <p className="text-[#ADB7BE] mb-2">I can come back as soon as possible.</p>
+        <p className="text-[#ADB7BE]">
+          Today {remainingEmails} email{remainingEmails !== 1 ? 's' : ''} left.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <section
@@ -154,6 +170,11 @@ const EmailSection = () => {
           </div>
         ) : (
           <form className="flex flex-col" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-500/20 text-red-500 rounded-xl p-4 mb-4">
+                {error}
+              </div>
+            )}
             <div className="mb-6">
               <label
                 htmlFor="email"
