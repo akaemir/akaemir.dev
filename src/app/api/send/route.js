@@ -6,17 +6,8 @@ const fromEmail = process.env.FROM_EMAIL;
 const toEmail = process.env.TO_EMAIL;
 
 export async function POST(req, res) {
+  const { email, subject, message } = await req.json();
   try {
-    const { email, subject, message } = await req.json();
-    
-    // Gerekli alanların kontrolü
-    if (!email || !subject || !message) {
-      return NextResponse.json(
-        { error: "Email, subject ve message alanları gereklidir." },
-        { status: 400 }
-      );
-    }
-
     const data = await resend.emails.send({
       from: fromEmail,
       to: [toEmail],
@@ -122,35 +113,8 @@ export async function POST(req, res) {
         </div>
       ),
     });
-
-    // Başarılı durumda response döndür
     return NextResponse.json(data);
-
   } catch (error) {
-    console.error("Email send error.", error);
-    
-    // Resend API hata detaylarını logla
-    if (error.response) {
-      console.error("Resend API Error Response:", error.response);
-      console.error("Resend API Error Data:", error.response.data);
-    }
-    
-    // Hata türüne göre mesaj belirle
-    let errorMessage = "Email does not sent. Please try again later.";
-    let statusCode = 500;
-    
-    if (error.message && error.message.includes('422')) {
-      errorMessage = "Email or domain is not valid. Please contact support.";
-      statusCode = 422;
-    }
-    
-    return NextResponse.json(
-      { 
-        error: errorMessage,
-        details: error.message,
-        success: false
-      },
-      { status: statusCode }
-    );
+    return NextResponse.json({ error });
   }
 }
