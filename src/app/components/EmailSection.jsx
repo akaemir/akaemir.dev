@@ -171,7 +171,7 @@ const EmailSection = () => {
               ✅ Email sent successfully!
             </p>
             <p className="text-sm mt-2">
-              Thank you for your message. I'll get back to you soon!
+              Thank you for your message. I&apos;ll get back to you soon!
             </p>
             <button
               onClick={() => {
@@ -243,7 +243,7 @@ const EmailSection = () => {
             <div className="mb-6 flex justify-center">
               <div
                 className="cf-turnstile"
-                data-sitekey={process.env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY}
+                data-sitekey={process.env.PUBLIC_CF_TURNSTILE_SITE_KEY}
                 data-theme="dark"
                 data-size="normal"
                 data-callback="onTurnstileCallback"
