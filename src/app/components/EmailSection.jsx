@@ -206,7 +206,7 @@ const EmailSection = () => {
             <div className="mb-6 flex justify-center">
               <div
                 className="cf-turnstile"
-                data-sitekey={env.PUBLIC_CF_TURNSTILE_SITE_KEY}
+                data-sitekey={process.env.PUBLIC_CF_TURNSTILE_SITE_KEY}
                 data-theme="dark"
                 data-size="normal"
                 data-callback="onTurnstileCallback"
