@@ -124,19 +124,10 @@ export async function POST(req, res) {
     });
 
     // Başarılı durumda response döndür
-    return NextResponse.json(
-      { 
-        message: "Email sent successfully.", 
-        success: true,
-        data: {
-          id: data.id || 'unknown'
-        }
-      },
-      { status: 200 }
-    );
+    return NextResponse.json(data);
 
   } catch (error) {
-    console.error("Email gönderme hatası:", error);
+    console.error("Email send error.", error);
     
     // Resend API hata detaylarını logla
     if (error.response) {
